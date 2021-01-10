@@ -63,10 +63,74 @@ exports.findOne = (req, res) => {
     });
 };
 
-exports.update = (req, res) => {};
+exports.update = (req, res) => {
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data to updated can not be empty!",
+    });
+  }
+  const id = req.params.id;
 
-exports.delete = (req, res) => {};
+  Tutorial.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot update Tutorial with id=${id}. Maybe Tutorial was not found!`,
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Error updating Tutorial with id=" + id,
+      });
+    });
+};
 
-exports.deleteAll = (req, res) => {};
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  Tutorial.findAndRemove(id)
+    .then((data) => {
+      if (!data) {
+        res.status(404).send({
+          message: `Cannot delete Tutorial with id=${id}. Maybe Tutorial was not found!`,
+        });
+      } else {
+        res.send({
+          message: "Tutorial was deleted successfully!",
+        });
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: "Could not delete Tutorial with id=" + id,
+      });
+    });
+};
 
-exports.findAllPublished = (req, res) => {};
+exports.deleteAll = (req, res) => {
+  Tutorial.deleteMany({})
+    .then((data) => {
+      res.send({
+        message: `${data.deletedCount} Tutorial were deleted successfully!`,
+      });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while removing all tutorials.",
+      });
+    });
+};
+
+exports.findAllPublished = (req, res) => {
+  Tutorial.find({ published: true })
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving tutorials.",
+      });
+    });
+};
