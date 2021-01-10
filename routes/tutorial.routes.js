@@ -4,6 +4,11 @@ module.exports = (app) => {
 
   router.post("/", tutorial.create);
   router.get("/", tutorial.findAll);
+  router.get("/", tutorial.findOne);
+  router.get("/", tutorial.findAllPublished);
+  router.put("/:id", tutorial.update);
+  router.delete("/:id", tutorial.delete);
+  router.delete("/", tutorial.deleteAll);
 
   app.use("/api/tutorials", router);
 };
